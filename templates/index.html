@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Tonight &mdash; Fridge&rarr;Fork{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">{{ fridge_items|length }} ingredient{{ 's' if fridge_items|length != 1 }} on hand &middot; {{ total_recipes }} recipe{{ 's' if total_recipes != 1 }} in the box</p>
+  <h1>What can I actually cook tonight?</h1>
+  <p class="hero-sub">Stock your fridge once, then this page tells you what's ready to go &mdash; no grocery run required.</p>
+</section>
+
+{% if not fridge_items %}
+  <div class="empty-state">
+    <h2>Your fridge is empty</h2>
+    <p>Add a few ingredients you have on hand to see which recipes are ready to cook.</p>
+    <a class="btn btn-primary" href="{{ url_for('fridge') }}">Stock the fridge</a>
+  </div>
+{% elif total_recipes == 0 %}
+  <div class="empty-state">
+    <h2>No recipes saved yet</h2>
+    <p>Save a recipe or two, and this page will match them against what's in your fridge.</p>
+    <a class="btn btn-primary" href="{{ url_for('new_recipe') }}">Add your first recipe</a>
+  </div>
+{% else %}
+
+  <section class="result-group">
+    <h2 class="group-title group-title-ready">Ready to cook <span class="count-badge">{{ makeable|length }}</span></h2>
+    {% if makeable %}
+      <div class="recipe-grid">
+        {% for item in makeable %}
+          {% set recipe = item.recipe %}
+          <a class="recipe-card status-makeable" href="{{ url_for('view_recipe', recipe_id=recipe.id) }}">
+            <h3>{{ recipe.title }}</h3>
+            <p class="recipe-meta">
+              {% if recipe.prep_time_minutes %}{{ recipe.prep_time_minutes }} min &middot; {% endif %}
+              {% if recipe.servings %}serves {{ recipe.servings }}{% endif %}
+            </p>
+            <span class="status-pill status-pill-ready">You have everything</span>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">Nothing fully ready yet &mdash; check "Almost there" below.</p>
+    {% endif %}
+  </section>
+
+  <section class="result-group">
+    <h2 class="group-title group-title-almost">Almost there <span class="count-badge">{{ almost|length }}</span></h2>
+    {% if almost %}
+      <div class="recipe-grid">
+        {% for item in almost %}
+          {% set recipe = item.recipe %}
+          <a class="recipe-card status-almost" href="{{ url_for('view_recipe', recipe_id=recipe.id) }}">
+            <h3>{{ recipe.title }}</h3>
+            <p class="recipe-meta">Missing {{ item.missing_count }} ingredient{{ 's' if item.missing_count != 1 }}:</p>
+            <div class="chip-row">
+              {% for link in item.missing %}
+                <span class="chip chip-missing">{{ link.ingredient.name }}</span>
+              {% endfor %}
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="muted">Nothing close right now.</p>
+    {% endif %}
+  </section>
+
+{% endif %}
+{% endblock %}

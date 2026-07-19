@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Recipe Box &mdash; Fridge&rarr;Fork{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>Recipe Box</h1>
+  <p class="hero-sub">Every recipe you've saved, sorted by how ready you are to cook it.</p>
+  <a class="btn btn-primary" href="{{ url_for('new_recipe') }}">+ Add a recipe</a>
+</section>
+
+{% if classified %}
+  <ul class="recipe-list">
+    {% for item in classified %}
+      {% set recipe = item.recipe %}
+      <li class="recipe-row status-{{ item.status.replace('_', '-') }}">
+        <a href="{{ url_for('view_recipe', recipe_id=recipe.id) }}">
+          <span class="recipe-row-title">{{ recipe.title }}</span>
+          {% if item.status == "makeable" %}
+            <span class="status-pill status-pill-ready">Ready now</span>
+          {% elif item.status == "almost" %}
+            <span class="status-pill status-pill-almost">Missing {{ item.missing_count }}</span>
+          {% else %}
+            <span class="status-pill status-pill-far">Missing {{ item.missing_count }}</span>
+          {% endif %}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <div class="empty-state">
+    <h2>No recipes saved yet</h2>
+    <a class="btn btn-primary" href="{{ url_for('new_recipe') }}">Add your first recipe</a>
+  </div>
+{% endif %}
+{% endblock %}

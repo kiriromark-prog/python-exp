@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Fridge to Fork{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a href="{{ url_for('dashboard') }}" class="brand">
+        <span class="brand-mark">&#8942;</span> Fridge<span class="brand-accent">→</span>Fork
+      </a>
+      <nav class="main-nav">
+        <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.endpoint == 'dashboard' }}">Tonight</a>
+        <a href="{{ url_for('fridge') }}" class="{{ 'active' if request.endpoint == 'fridge' }}">My Fridge</a>
+        <a href="{{ url_for('list_recipes') }}" class="{{ 'active' if request.endpoint == 'list_recipes' }}">Recipe Box</a>
+        <a href="{{ url_for('new_recipe') }}" class="cta-link">+ Add Recipe</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer wrap">
+    <span>Fridge&rarr;Fork &mdash; cook with what you've got.</span>
+  </footer>
+</body>
+</html>

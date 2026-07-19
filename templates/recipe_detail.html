@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ recipe.title }} &mdash; Fridge&rarr;Fork{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <a class="back-link" href="{{ url_for('list_recipes') }}">&larr; Recipe Box</a>
+  <h1>{{ recipe.title }}</h1>
+  <p class="recipe-meta">
+    {% if recipe.prep_time_minutes %}{{ recipe.prep_time_minutes }} min &middot; {% endif %}
+    {% if recipe.servings %}serves {{ recipe.servings }}{% endif %}
+  </p>
+
+  {% if result.status == "makeable" %}
+    <span class="status-pill status-pill-ready">You have everything you need</span>
+  {% elif result.status == "almost" %}
+    <span class="status-pill status-pill-almost">Missing {{ result.missing_count }} ingredient{{ 's' if result.missing_count != 1 }}</span>
+  {% else %}
+    <span class="status-pill status-pill-far">Missing {{ result.missing_count }} ingredients</span>
+  {% endif %}
+</section>
+
+<div class="two-col">
+  <div class="panel">
+    <h2>Ingredients</h2>
+    <ul class="ingredient-check-list">
+      {% for link in recipe.ingredient_links %}
+        <li class="{{ 'have' if link.ingredient_id in fridge_ids else 'missing' }}{{ ' is-optional' if link.optional }}">
+          <span class="check-mark">{{ '✓' if link.ingredient_id in fridge_ids else '—' }}</span>
+          <span class="ingredient-name">{{ link.ingredient.name }}</span>
+          {% if link.display_amount %}<span class="ingredient-amount">{{ link.display_amount }}</span>{% endif %}
+          {% if link.optional %}<span class="optional-tag">optional</span>{% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    {% if result.missing %}
+      <form method="POST" action="{{ url_for('add_missing_to_fridge', recipe_id=recipe.id) }}">
+        <button type="submit" class="btn btn-secondary">Add missing items to fridge</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <div class="panel">
+    <h2>Instructions</h2>
+    {% if recipe.instructions %}
+      <p class="instructions-text">{{ recipe.instructions }}</p>
+    {% else %}
+      <p class="muted">No instructions added.</p>
+    {% endif %}
+  </div>
+</div>
+
+<form method="POST" action="{{ url_for('delete_recipe', recipe_id=recipe.id) }}" onsubmit="return confirm('Delete this recipe?');">
+  <button type="submit" class="link-btn muted">Delete this recipe</button>
+</form>
+{% endblock %}

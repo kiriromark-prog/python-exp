@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}My Fridge &mdash; Fridge&rarr;Fork{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>My Fridge</h1>
+  <p class="hero-sub">What's in stock right now. Add items one at a time, or paste a whole list separated by commas.</p>
+</section>
+
+<div class="two-col">
+  <div class="panel">
+    <h2>Add ingredients</h2>
+    <form method="POST" action="{{ url_for('fridge') }}">
+      <label for="ingredient_names">Ingredient name(s)</label>
+      <textarea id="ingredient_names" name="ingredient_names" rows="3" placeholder="e.g. eggs, spinach, cheddar cheese" required></textarea>
+
+      <label for="quantity">Quantity <span class="optional-tag">(optional, applies to all above)</span></label>
+      <input type="text" id="quantity" name="quantity" placeholder="e.g. 2 cups">
+
+      <button type="submit" class="btn btn-primary">Add to fridge</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Currently stocked <span class="count-badge">{{ fridge_items|length }}</span></h2>
+    {% if fridge_items %}
+      <ul class="fridge-list">
+        {% for item in fridge_items %}
+          <li>
+            <span class="fridge-item-name">{{ item.ingredient.name }}</span>
+            {% if item.quantity %}<span class="fridge-item-qty">{{ item.quantity }}</span>{% endif %}
+            <form method="POST" action="{{ url_for('delete_fridge_item', item_id=item.id) }}" class="inline-form">
+              <button type="submit" class="link-btn" aria-label="Remove {{ item.ingredient.name }}">Remove</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+      <form method="POST" action="{{ url_for('clear_fridge') }}" onsubmit="return confirm('Clear the entire fridge?');">
+        <button type="submit" class="link-btn muted">Clear entire fridge</button>
+      </form>
+    {% else %}
+      <p class="muted">No ingredients yet. Add some on the left.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

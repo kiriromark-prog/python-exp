@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Add Recipe &mdash; Fridge&rarr;Fork{% endblock %}
+
+{% block content %}
+<section class="page-head">
+  <h1>Add a recipe</h1>
+  <p class="hero-sub">List every ingredient it needs. Mark garnishes or swaps as optional so they don't block "ready to cook".</p>
+</section>
+
+<form method="POST" action="{{ url_for('new_recipe') }}" class="panel recipe-form">
+  <label for="title">Title</label>
+  <input type="text" id="title" name="title" placeholder="e.g. Weeknight Fried Rice" required>
+
+  <div class="form-row-split">
+    <div>
+      <label for="servings">Servings</label>
+      <input type="number" id="servings" name="servings" min="1" placeholder="4">
+    </div>
+    <div>
+      <label for="prep_time_minutes">Prep time (minutes)</label>
+      <input type="number" id="prep_time_minutes" name="prep_time_minutes" min="1" placeholder="20">
+    </div>
+  </div>
+
+  <h3>Ingredients</h3>
+  <div id="ingredient-rows">
+    <div class="ingredient-row">
+      <input type="text" name="ingredient_name" placeholder="Ingredient name (e.g. garlic)" required>
+      <input type="text" name="ingredient_quantity" placeholder="Qty" class="small-input">
+      <input type="text" name="ingredient_unit" placeholder="Unit" class="small-input">
+      <label class="optional-check">
+        <input type="checkbox" name="ingredient_optional" value="0"> optional
+      </label>
+    </div>
+  </div>
+  <button type="button" id="add-row-btn" class="link-btn">+ Add another ingredient</button>
+
+  <label for="instructions">Instructions</label>
+  <textarea id="instructions" name="instructions" rows="6" placeholder="Step by step..."></textarea>
+
+  <button type="submit" class="btn btn-primary">Save recipe</button>
+</form>
+
+<script>
+  const rowsContainer = document.getElementById('ingredient-rows');
+  const addBtn = document.getElementById('add-row-btn');
+
+  addBtn.addEventListener('click', () => {
+    const index = rowsContainer.children.length;
+    const row = document.createElement('div');
+    row.className = 'ingredient-row';
+    row.innerHTML = `
+      <input type="text" name="ingredient_name" placeholder="Ingredient name">
+      <input type="text" name="ingredient_quantity" placeholder="Qty" class="small-input">
+      <input type="text" name="ingredient_unit" placeholder="Unit" class="small-input">
+      <label class="optional-check">
+        <input type="checkbox" name="ingredient_optional" value="${index}"> optional
+      </label>
+    `;
+    rowsContainer.appendChild(row);
+  });
+</script>
+{% endblock %}
